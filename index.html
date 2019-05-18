@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conway's Game of Life</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="main-title">
+    <span>GAME OF LIFE</span>
+  </div>
+  <!-- Настройки, которые не поменять во время игры -->
+  <section class="preplaying-settings">
+    <div class="container">
+      <!-- Размер поля -->
+    </div>
+  </section>
+  <!-- ------- ПОЛЕ ------- -->
+  <section class="field">
+    <div class="container">
+      <div class="field-window">
+        <div class="field-box" id="field">
+
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Настройки, которые можно менять в процессе игры -->
+  <section class="play-settings">
+    <!-- Trackbar для задания интервала между итерациями -->
+    <div class="speed-setter">
+      <img src="#" class="icon">
+      <span class="param" id="iterTime">0,5</span> <span class="unit">c</span>
+      <div class="slidecontainer">
+        <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+      </div>
+    </div>
+    <!-- Кнопка НАЧАТЬ -->
+    <input type="button" class="big-button button" value="START">
+    <div class="variable-settings">
+      <!-- Установить рандомное состояние поля -->
+      <div class="random-set">
+          <img src="" class="img-button">
+          <span class="caption">RANDOM</span>
+      </div>
+      <!-- Умертвить все клетки -->
+      <div class="clean-set">
+          <img src="" class="img-button">
+          <span class="caption">CLEAN</span>
+      </div>
+      <!-- Сделать поле бесконечным (сшить края)-->
+      <div class="infinity-set">
+          <label><input type="checkbox"> INFINITY FIELD</label>
+      </div>
+      <!-- Настройки отображения клеток -->
+      <div class="cell-appearance-settings">
+        <!-- Расстояние между клетками -->
+        <div class="spacer">
+          <img src="#" alt="spacer" class="icon">
+          <input class="spacer-num" id="spacer" type="number" value="0" step="1" min="0"/>
+          <span class="units"> px</span>
+        </div>
+        <!-- Закругление углов -->
+        <div class="round">
+          <img src="#" alt="round-icon" class="icon">
+          <input class="round-num" id="round" type="number" value="0" step="1" min="0"/>
+          <span class="units"> px</span>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!--<script src="script.js"></script>-->
+</body>
+</html>
