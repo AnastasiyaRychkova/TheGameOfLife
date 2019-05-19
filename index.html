@@ -7,66 +7,62 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="main-title">
+    <span>The Game of Life</span>
+  </div>
   <div class="container">
-    <div class="main-title">
-      <span>The Game of Life</span>
-    </div>
-    <!-- Настройки поля -->
-    <section class="field-settings">
-        <!-- TODO: Размер поля -->
-        <div class="size">
-            <div class="field-height-container">
-              <div class="icon field-height-icon"></div>
-              <div class="input-btn minus" id="height-minus"></div>
-              <input class="field-height-input" id="height" type="number" value="8" step="1" min="2"/>
-              <div class="input-btn plus" id="height-plus"></div>
-            </div>
-            <div class="field-width-container">
-              <div class="icon field-width-icon"></div>
-              <div class="input-btn minus" id="width-minus"></div>
-              <input class="field-width-input" id="width" type="number" value="8" step="1" min="2"/>
-              <div class="input-btn plus" id="width-plus"></div>
-            </div>
-        </div>
-        <!-- Сделать поле бесконечным (сшить края)-->
-        <div class="infinity-set">
-          <label><input type="checkbox"> INFINITY FIELD</label>
-        </div>
-    </section>
     <!-- ------- ПОЛЕ ------- -->
     <section class="field">
-      <div class="container">
-        <div class="field-window">
-          <div class="field-box" id="field">
+      <div class="field-window">
+        <div class="field-box" id="field">
 
-          </div>
         </div>
       </div>
     </section>
-    <!-- Настройки игры -->
-    <section class="game-settings">
-      <div class="main-button-box">
-        <!-- Кнопка НАЧАТЬ -->
-        <input type="button" class="big-button button" value="START">
+    <!-- Настройки поля -->
+    <section class="settings">
+      <!-- Размер поля -->
+      <div class="size">
+        <div class="field-size-container">
+          <div class="icon field-height-icon"></div>
+          <input class="field-input" id="height" type="number" value="8" step="1" min="2" max="9999"/>
+        </div>
+        <div class="caption field-size-caption">field size</div>
+        <div class="field-size-container">
+          <div class="icon field-width-icon"></div>
+          <input class="field-input" id="width" type="number" value="8" step="1" min="2" max="9999"/>
+        </div> 
       </div>
-      <div class="variable-settings">
+      <!-- Сделать поле бесконечным (сшить края)-->
+      <div class="infinity-set">
+        <div class="icon infinity-icon"></div>
+        <div class="infinity-checkbox">
+          <label class="lable">INFINITY FIELD
+            <input type="checkbox"> 
+            <span class="checkmark"></span>
+          </label>
+        </div>
+      </div> 
+        <!-- Trackbar для задания интервала между итерациями -->
+      <div class="speed-setter">
+        <div class="speed-value">
+          <div class="icon speed-icon"></div>
+          <span class="param" id="iterTime">0,5</span> <span class="unit">sec</span>
+        </div>
+        <div class="slidecontainer">
+          <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+        </div>
+      </div>
+      <div class="field-buttons">
+        <!-- Кнопка НАЧАТЬ -->
+        <div class="main-button"></div>
         <!-- Установить рандомное состояние поля -->
-        <div class="random-set">
-            <img src="" class="img-button">
-            <span class="caption">RANDOM</span>
+        <div class="btn random-button">
+          <span class="tooltip">Random field state</span>
         </div>
         <!-- Умертвить все клетки -->
-        <div class="clean-set">
-            <img src="" class="img-button">
-            <span class="caption">CLEAN</span>
-        </div>
-          <!-- Trackbar для задания интервала между итерациями -->
-        <div class="speed-setter">
-          <img src="#" class="icon">
-          <span class="param" id="iterTime">0,5</span> <span class="unit">c</span>
-          <div class="slidecontainer">
-            <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
-          </div>
+        <div class="btn clear-button">
+          <span class="tooltip">Kill all cells</span>
         </div>
       </div>
     </section>
