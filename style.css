@@ -7,6 +7,9 @@
 }
 
 body {
+    display: flex;
+    flex-direction: column;
+    height: 99vh;
     font-family: 'Raleway', sans-serif;
     font-size: 13px;
     font-weight: 500;
@@ -14,7 +17,9 @@ body {
 
 .container {
     display: flex;
+    align-items: flex-start;
     width: 95%;
+    height: 100%;
     margin: 0 auto;
     padding: 0 0 20px;
 }
@@ -31,9 +36,43 @@ body {
 }
 
 .field {
-    margin: 0 10px;
+    display: flex;
+    justify-content: center;
+    margin-right: 20px;
+    padding: 15px;
     width: 100%;
-    height: auto;
+    box-shadow: inset 0px 0px 8px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    align-self: stretch;
+}
+
+.field-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    flex-wrap: wrap;
+    height: 100%;
+    width: 303px;
+    border: solid 1px rgb(127, 182, 10);
+    border-style: dashed;
+
+}
+
+.cell {
+    margin: 0.5px;
+    width: 100px;
+    height: 100px;
+    background-color: #2196F3;
+    border-radius: 5px;
+}
+
+.living-cell {
+    background-color: rgb(175, 223, 46);
+}
+
+.dead-cell {
+    background-color: rgb(86, 176, 250);
 }
 
 .field-settings {
@@ -306,4 +345,4 @@ input[type="number"]::-webkit-outer-spin-button {
 .field-buttons {
     display: flex;
     align-items: center;
-}
+}}
