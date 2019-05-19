@@ -1,3 +1,7 @@
+var gameInstance = {
+
+}
+
 var gameMode = {
     minForLife: 2,
     maxForLife: 3
@@ -13,12 +17,12 @@ class Cell {
     }
 
     reviveTheCell() {
-        this.box.className = 'living-cell';
+        this.box.className = 'cell living-cell';
         this.next_st = true;
     }
 
     killTheCell() {
-        this.box.className = 'dead-cell';
+        this.box.className = 'cell dead-cell';
         this.next_st = false;
     }
 
@@ -101,31 +105,19 @@ class Cell {
 
 /** ПОЛЕ*/ 
 class Field { 
-    constructor (h, w) {
+    constructor (obj, h, w) {
         this.h = h; // высота поля (в клетках)
         this.w = w; // ширина поля
-        this.cellArray = []; // массив клеток
+        this.cellArray = new Array(h); // массив клеток
         this.iterTime = 5000; // время между итерациями
         this.iterCounter = 0; // количество законченных итераций
         this.isInfinity = false; // является ли поле бесконечным
-        this.flexbox = document.getElementById('field'); // поле в документе
+        this.flexbox = obj; // поле в документе
         this.timer = null;
+        this.cellMargin = 0.5;
 
         Cell.prototype.getField = function() {
-            return cellArray;
-        }
-
-// TODO: Задать размеры поля в документе и размеры ячеек
-        var i, j;
-        for (i = 1; i <= h; i++) {
-            for (j = 1; j <= w; j++) {
-                this.cellArray[i][j] = new Cell(); // создание мертвых клеток
-                this.cellArray[i][j].box = document.createElement('div');
-                this.cellArray[i][j].box.className = 'dead-cell';
-                this.cellArray[i][j].box.x = i - 1;
-                this.cellArray[i][j].box.y = j - 1;
-                this.flexbox.appendChild(this.cellArray[i][j].box); // добавление в документ
-            }
+            return this.cellArray;
         }
 
         // Создание бордюра из мертвых клеток, чтобы извавиться от проверок на границах поля
@@ -133,6 +125,7 @@ class Field {
             lastIndexW = w + 1;
         // Слева и справа
         for (i = 0; i <= lastIndexH; i++) {
+            this.cellArray[i] = new Array(w);
             this.cellArray[i][0] = new Cell();
             this.cellArray[i][lastIndexW] = new Cell();
         }
@@ -140,6 +133,19 @@ class Field {
         for (j = 1; j <= w; j++) {
             this.cellArray[0][j] = new Cell();
             this.cellArray[lastIndexH][j] = new Cell();
+        }
+
+        // TODO: Задать размеры поля в документе и размеры ячеек
+        var i, j;
+        for (i = 1; i <= h; i++) {
+            for (j = 1; j <= w; j++) {
+                this.cellArray[i][j] = new Cell(); // создание мертвых клеток
+                this.cellArray[i][j].box = document.createElement('div');
+                this.cellArray[i][j].box.className = 'cell dead-cell';
+                this.cellArray[i][j].box.x = i - 1;
+                this.cellArray[i][j].box.y = j - 1;
+                this.flexbox.appendChild(this.cellArray[i][j].box); // добавление в документ
+            }
         }
 
     }
@@ -175,6 +181,9 @@ class Field {
         /**TODO: нормировать значение probability / 100
          * при нулевой вероятности запускать clean()
         */
+        if (probability == undefined) {
+            probability = 0.5;
+        }
         for (let i = 1; i <= this.h; i++)
             for (let j = 0; j <= this.w; j++)
                 this.cellArray[i][j].setState(Math.random() <= probability);
@@ -194,4 +203,20 @@ class Field {
     stopLiving() {
         clearTimeout(this.timer);
     }
+
+    cssResize() {
+        var col, // количество клеток на длинной стороне
+            len; // длина длинной стороны в пикселях
+        if (this.h >= this.w) {
+            this.box.style.height = '100%';
+            // FIXME: надо учесть пропорции экрана!
+        }
+    }
 }
+
+//
+window.onload = function() {
+    var docField = document.getElementById('field');
+    gameInstance.field = new Field (docField, 8, 8);
+}
+
