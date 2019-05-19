@@ -7,69 +7,86 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="main-title">
-    <span>GAME OF LIFE</span>
-  </div>
-  <!-- Настройки, которые не поменять во время игры -->
-  <section class="preplaying-settings">
-    <div class="container">
-      <!-- Размер поля -->
+  <div class="container">
+    <div class="main-title">
+      <span>The Game of Life</span>
     </div>
-  </section>
-  <!-- ------- ПОЛЕ ------- -->
-  <section class="field">
-    <div class="container">
-      <div class="field-window">
-        <div class="field-box" id="field">
-
+    <!-- Настройки поля -->
+    <section class="field-settings">
+        <!-- TODO: Размер поля -->
+        <div class="size">
+            <div class="field-height-container">
+              <div class="icon field-height-icon"></div>
+              <div class="input-btn minus" id="height-minus"></div>
+              <input class="field-height-input" id="height" type="number" value="8" step="1" min="2"/>
+              <div class="input-btn plus" id="height-plus"></div>
+            </div>
+            <div class="field-width-container">
+              <div class="icon field-width-icon"></div>
+              <div class="input-btn minus" id="width-minus"></div>
+              <input class="field-width-input" id="width" type="number" value="8" step="1" min="2"/>
+              <div class="input-btn plus" id="width-plus"></div>
+            </div>
         </div>
-      </div>
-    </div>
-  </section>
-  <!-- Настройки, которые можно менять в процессе игры -->
-  <section class="play-settings">
-    <!-- Trackbar для задания интервала между итерациями -->
-    <div class="speed-setter">
-      <img src="#" class="icon">
-      <span class="param" id="iterTime">0,5</span> <span class="unit">c</span>
-      <div class="slidecontainer">
-        <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
-      </div>
-    </div>
-    <!-- Кнопка НАЧАТЬ -->
-    <input type="button" class="big-button button" value="START">
-    <div class="variable-settings">
-      <!-- Установить рандомное состояние поля -->
-      <div class="random-set">
-          <img src="" class="img-button">
-          <span class="caption">RANDOM</span>
-      </div>
-      <!-- Умертвить все клетки -->
-      <div class="clean-set">
-          <img src="" class="img-button">
-          <span class="caption">CLEAN</span>
-      </div>
-      <!-- Сделать поле бесконечным (сшить края)-->
-      <div class="infinity-set">
+        <!-- Сделать поле бесконечным (сшить края)-->
+        <div class="infinity-set">
           <label><input type="checkbox"> INFINITY FIELD</label>
-      </div>
-      <!-- Настройки отображения клеток -->
-      <div class="cell-appearance-settings">
-        <!-- Расстояние между клетками -->
-        <div class="spacer">
-          <img src="#" alt="spacer" class="icon">
-          <input class="spacer-num" id="spacer" type="number" value="0" step="1" min="0"/>
-          <span class="units"> px</span>
         </div>
-        <!-- Закругление углов -->
-        <div class="round">
-          <img src="#" alt="round-icon" class="icon">
-          <input class="round-num" id="round" type="number" value="0" step="1" min="0"/>
-          <span class="units"> px</span>
+    </section>
+    <!-- ------- ПОЛЕ ------- -->
+    <section class="field">
+      <div class="container">
+        <div class="field-window">
+          <div class="field-box" id="field">
+
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+    <!-- Настройки игры -->
+    <section class="game-settings">
+      <div class="main-button-box">
+        <!-- Кнопка НАЧАТЬ -->
+        <input type="button" class="big-button button" value="START">
+      </div>
+      <div class="variable-settings">
+        <!-- Установить рандомное состояние поля -->
+        <div class="random-set">
+            <img src="" class="img-button">
+            <span class="caption">RANDOM</span>
+        </div>
+        <!-- Умертвить все клетки -->
+        <div class="clean-set">
+            <img src="" class="img-button">
+            <span class="caption">CLEAN</span>
+        </div>
+          <!-- Trackbar для задания интервала между итерациями -->
+        <div class="speed-setter">
+          <img src="#" class="icon">
+          <span class="param" id="iterTime">0,5</span> <span class="unit">c</span>
+          <div class="slidecontainer">
+            <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
   <!--<script src="script.js"></script>-->
 </body>
 </html>
+
+<!-- Настройки отображения клеток -->
+<!--<div class="cell-appearance-settings">-->
+  <!-- Расстояние между клетками -->
+<!--  <div class="spacer">-->
+<!--    <img src="#" alt="spacer" class="icon">-->
+<!--    <input class="spacer-num" id="spacer" type="number" value="0" step="1" min="0"/>-->
+<!--    <span class="units"> px</span>-->
+<!--  </div>-->
+  <!-- Закругление углов -->
+<!--  <div class="round">-->
+<!--    <img src="#" alt="round-icon" class="icon">-->
+<!--    <input class="round-num" id="round" type="number" value="0" step="1" min="0"/>-->
+<!--    <span class="units"> px</span>-->
+<!--  </div>-->
+<!--</div>-->

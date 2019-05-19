@@ -22,6 +22,11 @@ class Cell {
         this.next_st = false;
     }
 
+    setState (newState) {
+        newState ? this.reviveTheCell()
+                 : this.killTheCell();
+    }
+
     nextState() {
         /** Переход к следующему состоянию исходя из обстановки вокруг
          * Меняет внешний вид клетки
@@ -50,10 +55,10 @@ class Cell {
                 var field = this.getField(); 
 
                 var stepForvard = function(x, maxX) {
-                    return (x + 1) / maxX;
+                    return parseInt((x + 1) / maxX);
                 }
                 var stepBack = function(x, maxX) {
-                    return (x - 1 + maxX) / maxX;
+                    return parseInt((x - 1 + maxX) / maxX);
                 }
                 // Проверить, является клетка с координатами [x,y] живой
                 var checkNeighbor = function(x, y) {
@@ -101,9 +106,10 @@ class Field {
         this.w = w; // ширина поля
         this.cellArray = []; // массив клеток
         this.iterTime = 5000; // время между итерациями
-        this.iterCount = 0; // количество законченных итераций
+        this.iterCounter = 0; // количество законченных итераций
         this.isInfinity = false; // является ли поле бесконечным
         this.flexbox = document.getElementById('field'); // поле в документе
+        this.timer = null;
 
         Cell.prototype.getField = function() {
             return cellArray;
@@ -118,7 +124,7 @@ class Field {
                 this.cellArray[i][j].box.className = 'dead-cell';
                 this.cellArray[i][j].box.x = i - 1;
                 this.cellArray[i][j].box.y = j - 1;
-                this.flexbox.appendChild(cellArray[i][j].box); // добавление в документ
+                this.flexbox.appendChild(this.cellArray[i][j].box); // добавление в документ
             }
         }
 
@@ -145,8 +151,47 @@ class Field {
     setIterTime(newIter) {
         this.iterTime = newIter;
     }
-//TODO: Уметвление всего поля:)
+  
+  
     clean() {
-        for (let i = 1; i <= )
+        for (let i = 1; i <= this.h; i++)
+            for (let j = 1; j <= this.w; j++)
+                this.cellArray[i][j].killTheCell();
+    }
+  
+    nextFieldState() {
+        for (let i = 1; i < this.h; i++)
+            for (let j = 0; j < this.w; j++)
+                this.cellArray[i][j].iteration();
+    }
+  
+    applyCurrState() {
+        for (let i = 1; i < this.h; i++)
+            for (let j = 0; j < this.w; j++)
+                this.cellArray[i][j].applyNewState();
+    }
+
+    randomState(probability) {
+        /**TODO: нормировать значение probability / 100
+         * при нулевой вероятности запускать clean()
+        */
+        for (let i = 1; i <= this.h; i++)
+            for (let j = 0; j <= this.w; j++)
+                this.cellArray[i][j].setState(Math.random() <= probability);
+    }
+  
+    startLiving() {
+        this.timer = setTimeout(this.iteration, this.iterTime);
+    }
+  
+    iteration() {
+        this.iterCounter++;
+        this.nextFieldState();
+        this.timer = setTimeout(this.iteration, this.iterTime);
+        this.applyCurrState();
+    }
+  
+    stopLiving() {
+        clearTimeout(this.timer);
     }
 }
