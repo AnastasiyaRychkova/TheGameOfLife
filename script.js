@@ -115,6 +115,7 @@ class Field {
         this.flexbox = obj; // поле в документе
         this.timer = null;
         this.cellMargin = 0.5;
+        this.cellStyleText = document.createTextNode('.cell {width: 50px; height: 50px;}');
 
         Cell.prototype.getField = function() {
             return this.cellArray;
@@ -147,6 +148,9 @@ class Field {
                 this.flexbox.appendChild(this.cellArray[i][j].box); // добавление в документ
             }
         }
+
+        this.cssResize();
+        gameInstance.sheet.appendChild(this.cellStyleText);
 
     }
 
@@ -206,10 +210,13 @@ class Field {
 
     cssResize() {
         var col, // количество клеток на длинной стороне
-            len; // длина длинной стороны в пикселях
-        if (this.h >= this.w) {
-            this.box.style.height = '100%';
-            // FIXME: надо учесть пропорции экрана!
+            len, // длина длинной стороны в пикселях
+            docWH = this.flexbox.clientWidth / this.flexbox.clientHeight; // отношение ширины .flexbox к ее высоте в px
+        if ( docWH >= this.w / this.h) {
+            let cellSize = parseInt((this.flexbox.clientHeight - 2 * this.cellMargin * this.h) / this.h);
+            this.cellStyleText.textContent = '.cell {width: ' + cellSize + 'px; height: ' + cellSize + 'px;}';
+            this.box.style.width = toString(cellSize * this.w + 2 * this.cellMargin) + 'px';
+            
         }
     }
 }
@@ -218,5 +225,7 @@ class Field {
 window.onload = function() {
     var docField = document.getElementById('field');
     gameInstance.field = new Field (docField, 8, 8);
+    gameInstance.sheet = document.createElement('style');
+    (document.head || document.getElementsByTagName('head')[0]).appendChild(gameInstance.sheet);
 }
 
