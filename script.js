@@ -1,5 +1,6 @@
 var gameInstance = {
-    sheet: null
+    sheet: null,
+    state: 'loading'
 }
 
 var gameMode = {
@@ -146,7 +147,6 @@ class Field {
             this.cellArray[lastIndexH][j] = new Cell();
         }
 
-        // TODO: Задать размеры поля в документе и размеры ячеек
         var i, j;
         for (i = 1; i <= h; i++) {
             for (j = 1; j <= w; j++) {
@@ -206,19 +206,19 @@ class Field {
             probability = 0.5;
         }
         for (let i = 1; i <= this.h; i++)
-            for (let j = 0; j <= this.w; j++)
+            for (let j = 1; j <= this.w; j++)
                 this.cellArray[i][j].setState(Math.random() <= probability);
     }
   
     startLiving() {
-        this.timer = setTimeout(this.iteration, this.iterTime);
+        this.timer = setTimeout(this.iteration, this.iterTime, this);
     }
   
-    iteration() {
-        this.iterCounter++;
-        this.nextFieldState();
-        this.timer = setTimeout(this.iteration, this.iterTime);
-        this.applyCurrState();
+    iteration(fieldObj) {
+        fieldObj.iterCounter++;
+        fieldObj.nextFieldState();
+        fieldObj.timer = setTimeout(fieldObj.iteration, fieldObj.iterTime, fieldObj);
+        fieldObj.applyCurrState();
     }
   
     stopLiving() {
@@ -227,24 +227,125 @@ class Field {
 
     cssResize() {
         var fieldParent = this.flexbox.parentElement,
-            docWH = fieldParent.clientWidth / fieldParent.clientHeight; // отношение ширины .flexbox к ее высоте в px
+            docWH = fieldParent.clientWidth / fieldParent.clientHeight, // отношение ширины .flexbox к ее высоте в px
+            cellSize;
+        //FIXME: странно работает перестройка относительно высоты
         if ( docWH >= (this.w / this.h)) {
-            let cellSize = parseInt((fieldParent.clientHeight - 3 * this.cellMargin * this.h) / this.h);
-            this.cellStyleText.textContent = '.cell {width: ' + cellSize + 'px; height: ' + cellSize + 'px;}';
+            cellSize = parseInt((fieldParent.clientHeight - 2 * this.cellMargin * this.h) / this.h);
             let newWidth = cellSize * (this.w + 2 * this.cellMargin);
             console.log(fieldParent.clientWidth, fieldParent.clientHeight, newWidth, cellSize);
             this.flexbox.style.width = newWidth + 'px';
         } else { 
             this.flexbox.style.width = '100%';
-            let cellSize = parseInt((this.flexbox.clientWidth - 2 * this.cellMargin * this.w) / this.w);
-            this.cellStyleText.textContent = '.cell {width: ' + cellSize + 'px; height: ' + cellSize + 'px;}';
+            cellSize = parseInt((this.flexbox.clientWidth - 2 * this.cellMargin * this.w) / this.w);
         }
+        this.cellStyleText.textContent = '.cell {width: ' + cellSize + 'px; height: ' + cellSize + 'px;}';
     }
+}
+
+gameInstance.gameInit = function() {
+    gameInstance.playButton    = document.getElementById('playButton');
+    gameInstance.randomButton  = document.getElementById('randomButton');
+    gameInstance.killingButton = document.getElementById('killingButton');
+    gameInstance.heightInput   = document.getElementById('height');
+    gameInstance.widthInput    = document.getElementById('width');
+    gameInstance.speedRange    = document.getElementById('speedRange');
+    gameInstance.iterTime      = document.getElementById('iterTime');
+    gameInstance.checkbox      = document.getElementById('checkbox');
+
+    gameInstance.iterTime.innerHTML = speedRange.value;
+    speedRange.oninput = function() {
+        gameInstance.field.iterTime = this.value;
+        gameInstance.iterTime.innerHTML = this.value;
+    }
+
+    gameInstance.checkbox.onchange = function() {
+        gameInstance.field.setInfinityOfField(gameInstance.checkbox.checked);
+        console.log('checked');
+    }
+
+    gameInstance.heightInput.onchange = function() {
+        var num = Math.trunc(gameInstance.heightInput.value);
+        if (num < 2) 
+            num = 2;
+        gameInstance.heightInput.value = num;
+    }
+
+    gameInstance.heightInput.oninput = function () {
+        if (gameInstance.heightInput.value.length > 4) 
+            gameInstance.heightInput.value = gameInstance.heightInput.value.substr(0, 4);
+    }
+
+    gameInstance.widthInput.onchange = function() {
+        var num = Math.trunc(gameInstance.widthInput.value);
+        if (num < 2) 
+            num = 2;
+        gameInstance.widthInput.value = num;
+    }
+
+    gameInstance.widthInput.oninput = function () {
+        if (gameInstance.widthInput.value.length > 4) 
+            gameInstance.widthInput.value = gameInstance.widthInput.value.substr(0, 4);
+    }
+
+    gameInstance.playButton.addEventListener('click', playBtnClick);
+
+    gameInstance.activateButtons();
+}
+
+gameInstance.activateButtons = function() {
+    gameInstance.randomButton.addEventListener('click', activateRandomBtn);
+    gameInstance.killingButton.addEventListener('click', activateKillingBtn);
+}
+
+gameInstance.deactivateButtons = function() {
+    gameInstance.randomButton.removeEventListener('click', activateRandomBtn);
+    gameInstance.killingButton.removeEventListener('click', activateKillingBtn);
+}
+
+gameInstance.setStartState = function() {
+    if (gameInstance.state == 'play') 
+        return;
+    gameInstance.state = 'play';
+    gameInstance.playButton.style.backgroundImage = "url('img/icons8-pause.png')";
+    gameInstance.field.startLiving();
+    gameInstance.deactivateButtons();
+}
+
+gameInstance.setStopState = function() {
+    if (gameInstance.state == 'stop') 
+        return;
+    gameInstance.state = 'stop';
+    gameInstance.playButton.style.backgroundImage = "url('img/icons8-start.png')";
+    gameInstance.field.stopLiving();
+    gameInstance.activateButtons();
+}
+
+function playBtnClick() {
+    if (gameInstance.state == 'play') 
+        gameInstance.setStopState();
+    else 
+        gameInstance.setStartState();
+}
+
+function activateRandomBtn() {
+    gameInstance.field.randomState();
+}
+
+function activateKillingBtn() {
+    gameInstance.field.clean();
+}
+
+function windowResizeEvent() {
+    gameInstance.field.cssResize();
 }
 
 //
 window.onload = function() {
     var docField = document.getElementById('field');
-    gameInstance.field = new Field (docField, 8, 10);
+    gameInstance.field = new Field (docField, 8, 8);
+
+    window.addEventListener('resize', windowResizeEvent);
+    gameInstance.gameInit();
 }
 
