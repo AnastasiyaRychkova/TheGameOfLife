@@ -1,5 +1,5 @@
 var gameInstance = {
-
+    sheet: null
 }
 
 var gameMode = {
@@ -30,6 +30,16 @@ class Cell {
         newState ? this.reviveTheCell()
                  : this.killTheCell();
     }
+  
+  	toggleState() {
+     		if (this.curr_st) {
+            this.box.className = 'cell dead-cell';
+            this.curr_st = false;
+        } else {
+            this.box.className = 'cell living-cell';
+            this.curr_st = true;
+        }
+    } 
 
     nextState() {
         /** Переход к следующему состоянию исходя из обстановки вокруг
@@ -148,6 +158,13 @@ class Field {
                 this.flexbox.appendChild(this.cellArray[i][j].box); // добавление в документ
             }
         }
+      
+        var sheetArr = document.getElementsByTagName('style'); 
+        if (sheetArr.length == 0) {
+            gameInstance.sheet = document.createElement('style'); 
+            (document.head || document.getElementsByTagName('head')[0]).appendChild (gameInstance.sheet);
+        } else
+            gameInstance.sheet = sheetArr[0];
 
         this.cssResize();
         gameInstance.sheet.appendChild(this.cellStyleText);
@@ -209,14 +226,18 @@ class Field {
     }
 
     cssResize() {
-        var col, // количество клеток на длинной стороне
-            len, // длина длинной стороны в пикселях
-            docWH = this.flexbox.clientWidth / this.flexbox.clientHeight; // отношение ширины .flexbox к ее высоте в px
-        if ( docWH >= this.w / this.h) {
-            let cellSize = parseInt((this.flexbox.clientHeight - 2 * this.cellMargin * this.h) / this.h);
+        var fieldParent = this.flexbox.parentElement,
+            docWH = fieldParent.clientWidth / fieldParent.clientHeight; // отношение ширины .flexbox к ее высоте в px
+        if ( docWH >= (this.w / this.h)) {
+            let cellSize = parseInt((fieldParent.clientHeight - 3 * this.cellMargin * this.h) / this.h);
             this.cellStyleText.textContent = '.cell {width: ' + cellSize + 'px; height: ' + cellSize + 'px;}';
-            this.box.style.width = toString(cellSize * this.w + 2 * this.cellMargin) + 'px';
-            
+            let newWidth = cellSize * (this.w + 2 * this.cellMargin);
+            console.log(fieldParent.clientWidth, fieldParent.clientHeight, newWidth, cellSize);
+            this.flexbox.style.width = newWidth + 'px';
+        } else { 
+            this.flexbox.style.width = '100%';
+            let cellSize = parseInt((this.flexbox.clientWidth - 2 * this.cellMargin * this.w) / this.w);
+            this.cellStyleText.textContent = '.cell {width: ' + cellSize + 'px; height: ' + cellSize + 'px;}';
         }
     }
 }
@@ -224,8 +245,6 @@ class Field {
 //
 window.onload = function() {
     var docField = document.getElementById('field');
-    gameInstance.field = new Field (docField, 8, 8);
-    gameInstance.sheet = document.createElement('style');
-    (document.head || document.getElementsByTagName('head')[0]).appendChild(gameInstance.sheet);
+    gameInstance.field = new Field (docField, 8, 10);
 }
 
