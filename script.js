@@ -1,11 +1,12 @@
-var gameInstance = {
+var gI = {
     sheet: null,
     state: 'loading'
 }
 
 var gameMode = {
     minForLife: 2,
-    maxForLife: 3
+    maxForLife: 3,
+    hoverTime: 2000
 }
 
 /** КЛЕТКА*/
@@ -28,12 +29,17 @@ class Cell {
     }
 
     setState (newState) {
-        newState ? this.reviveTheCell()
-                 : this.killTheCell();
+        if (newState) {
+            this.box.className = 'cell living-cell';
+            this.curr_st = true;
+        } else {
+            this.box.className = 'cell dead-cell';
+            this.curr_st = false;
+        }
     }
   
   	toggleState() {
-     		if (this.curr_st) {
+     	if (this.curr_st) {
             this.box.className = 'cell dead-cell';
             this.curr_st = false;
         } else {
@@ -49,10 +55,15 @@ class Cell {
          */
         var aliveNeighbors = this.neighborTraversal();
 
-        if (this.curr_st && (aliveNeighbors < gameMode.minForLife || aliveNeighbors > gameMode.maxForLife)) 
+        if (this.curr_st && (aliveNeighbors < gameMode.minForLife || aliveNeighbors > gameMode.maxForLife)) {
             this.killTheCell();
-        else if (this.curr_st == false && (aliveNeighbors >= gameMode.minForLife || aliveNeighbors <= gameMode.maxForLife)) 
+            return;
+        }
+        if (!this.curr_st && (aliveNeighbors == gameMode.maxForLife)) {
             this.reviveTheCell();
+            return;
+        }
+        this.next_st = this.curr_st;
     }
 
     applyNewState() {
@@ -104,7 +115,7 @@ class Cell {
 
                 for (let i = -1; i <= 1; i++) {
                     for (let j = -1; j <= 1; j++) {
-                        if ((i || j) && field [this.box.x + i + 1] [this.box.y + j + 1]) // если это не сама клетка и эта клетка живая
+                        if ((i || j) && field [this.box.x + i + 1] [this.box.y + j + 1].curr_st) // если это не сама клетка и эта клетка живая
                             aliveNeighbors++; // увеличить счетчить живых соседей
                     }
                 }
@@ -129,7 +140,7 @@ class Field {
         this.cellStyleText = document.createTextNode('.cell {width: 50px; height: 50px;}');
 
         Cell.prototype.getField = function() {
-            return this.cellArray;
+            return gI.field.cellArray;
         }
 
         // Создание бордюра из мертвых клеток, чтобы извавиться от проверок на границах поля
@@ -161,13 +172,13 @@ class Field {
       
         var sheetArr = document.getElementsByTagName('style'); 
         if (sheetArr.length == 0) {
-            gameInstance.sheet = document.createElement('style'); 
-            (document.head || document.getElementsByTagName('head')[0]).appendChild (gameInstance.sheet);
+            gI.sheet = document.createElement('style'); 
+            (document.head || document.getElementsByTagName('head')[0]).appendChild (gI.sheet);
         } else
-            gameInstance.sheet = sheetArr[0];
+            gI.sheet = sheetArr[0];
 
         this.cssResize();
-        gameInstance.sheet.appendChild(this.cellStyleText);
+        gI.sheet.appendChild(this.cellStyleText);
 
     }
 
@@ -186,16 +197,16 @@ class Field {
                 this.cellArray[i][j].killTheCell();
     }
   
-    nextFieldState() {
-        for (let i = 1; i < this.h; i++)
-            for (let j = 0; j < this.w; j++)
-                this.cellArray[i][j].iteration();
+    nextFieldState(fieldObj) {
+        for (let i = 1; i <= fieldObj.h; i++)
+            for (let j = 1; j <= fieldObj.w; j++)
+                fieldObj.cellArray[i][j].nextState();
     }
   
-    applyCurrState() {
-        for (let i = 1; i < this.h; i++)
-            for (let j = 0; j < this.w; j++)
-                this.cellArray[i][j].applyNewState();
+    applyCurrState(fieldObj) {
+        for (let i = 1; i <= fieldObj.h; i++)
+            for (let j = 1; j <= fieldObj.w; j++)
+                fieldObj.cellArray[i][j].applyNewState();
     }
 
     randomState(probability) {
@@ -216,9 +227,9 @@ class Field {
   
     iteration(fieldObj) {
         fieldObj.iterCounter++;
-        fieldObj.nextFieldState();
+        fieldObj.nextFieldState(fieldObj);
         fieldObj.timer = setTimeout(fieldObj.iteration, fieldObj.iterTime, fieldObj);
-        fieldObj.applyCurrState();
+        fieldObj.applyCurrState(fieldObj);
     }
   
     stopLiving() {
@@ -243,109 +254,124 @@ class Field {
     }
 }
 
-gameInstance.gameInit = function() {
-    gameInstance.playButton    = document.getElementById('playButton');
-    gameInstance.randomButton  = document.getElementById('randomButton');
-    gameInstance.killingButton = document.getElementById('killingButton');
-    gameInstance.heightInput   = document.getElementById('height');
-    gameInstance.widthInput    = document.getElementById('width');
-    gameInstance.speedRange    = document.getElementById('speedRange');
-    gameInstance.iterTime      = document.getElementById('iterTime');
-    gameInstance.checkbox      = document.getElementById('checkbox');
+gI.gameInit = function() {
+    gI.playButton    = document.getElementById('playButton');
+    gI.randomButton  = document.getElementById('randomButton');
+    gI.killingButton = document.getElementById('killingButton');
+    gI.heightInput   = document.getElementById('height');
+    gI.widthInput    = document.getElementById('width');
+    gI.speedRange    = document.getElementById('speedRange');
+    gI.iterTime      = document.getElementById('iterTime');
+    gI.checkbox      = document.getElementById('checkbox');
 
-    gameInstance.iterTime.innerHTML = speedRange.value;
+    gI.iterTime.innerHTML = speedRange.value;
     speedRange.oninput = function() {
-        gameInstance.field.iterTime = this.value;
-        gameInstance.iterTime.innerHTML = this.value;
+        gI.field.iterTime = this.value * 1000;
+        gI.iterTime.innerHTML = this.value;
     }
 
-    gameInstance.checkbox.onchange = function() {
-        gameInstance.field.setInfinityOfField(gameInstance.checkbox.checked);
+    gI.checkbox.onchange = function() {
+        gI.field.setInfinityOfField(gI.checkbox.checked);
         console.log('checked');
     }
 
-    gameInstance.heightInput.onchange = function() {
-        var num = Math.trunc(gameInstance.heightInput.value);
+    gI.heightInput.onchange = function() {
+        var num = Math.trunc(gI.heightInput.value);
         if (num < 2) 
             num = 2;
-        gameInstance.heightInput.value = num;
+        gI.heightInput.value = num;
+        var w = gI.field.w;
+        gI.docField.innerHTML = '';
+        gI.field = new Field(gI.docField, num, w);
     }
 
-    gameInstance.heightInput.oninput = function () {
-        if (gameInstance.heightInput.value.length > 4) 
-            gameInstance.heightInput.value = gameInstance.heightInput.value.substr(0, 4);
+    gI.heightInput.oninput = function () {
+        if (gI.heightInput.value.length > 2) 
+            gI.heightInput.value = gI.heightInput.value.substr(0, 2);
     }
 
-    gameInstance.widthInput.onchange = function() {
-        var num = Math.trunc(gameInstance.widthInput.value);
+    gI.widthInput.onchange = function() {
+        var num = Math.trunc(gI.widthInput.value);
         if (num < 2) 
             num = 2;
-        gameInstance.widthInput.value = num;
+        gI.widthInput.value = num;
+        var h = gI.field.h;
+        gI.docField.innerHTML = '';
+        gI.field = new Field(gI.docField, h, num);
     }
 
-    gameInstance.widthInput.oninput = function () {
-        if (gameInstance.widthInput.value.length > 4) 
-            gameInstance.widthInput.value = gameInstance.widthInput.value.substr(0, 4);
+    gI.widthInput.oninput = function () {
+        if (gI.widthInput.value.length > 2) 
+            gI.widthInput.value = gI.widthInput.value.substr(0, 2);
     }
 
-    gameInstance.playButton.addEventListener('click', playBtnClick);
+    gI.playButton.addEventListener('click', playBtnClick);
+    gI.docField.addEventListener('click', fieldClickEvent);
 
-    gameInstance.activateButtons();
+    gI.activateButtons();
 }
 
-gameInstance.activateButtons = function() {
-    gameInstance.randomButton.addEventListener('click', activateRandomBtn);
-    gameInstance.killingButton.addEventListener('click', activateKillingBtn);
+gI.activateButtons = function() {
+    gI.randomButton.addEventListener('click', activateRandomBtn);
+    gI.killingButton.addEventListener('click', activateKillingBtn);
 }
 
-gameInstance.deactivateButtons = function() {
-    gameInstance.randomButton.removeEventListener('click', activateRandomBtn);
-    gameInstance.killingButton.removeEventListener('click', activateKillingBtn);
+gI.deactivateButtons = function() {
+    gI.randomButton.removeEventListener('click', activateRandomBtn);
+    gI.killingButton.removeEventListener('click', activateKillingBtn);
 }
 
-gameInstance.setStartState = function() {
-    if (gameInstance.state == 'play') 
+gI.setStartState = function() {
+    if (gI.state == 'play') 
         return;
-    gameInstance.state = 'play';
-    gameInstance.playButton.style.backgroundImage = "url('img/icons8-pause.png')";
-    gameInstance.field.startLiving();
-    gameInstance.deactivateButtons();
+    gI.state = 'play';
+    gI.playButton.style.backgroundImage = "url('img/icons8-pause.png')";
+    gI.field.startLiving();
+    gI.deactivateButtons();
+    gI.docField.removeEventListener('click', fieldClickEvent);
 }
 
-gameInstance.setStopState = function() {
-    if (gameInstance.state == 'stop') 
+gI.setStopState = function() {
+    if (gI.state == 'stop') 
         return;
-    gameInstance.state = 'stop';
-    gameInstance.playButton.style.backgroundImage = "url('img/icons8-start.png')";
-    gameInstance.field.stopLiving();
-    gameInstance.activateButtons();
+    gI.state = 'stop';
+    gI.playButton.style.backgroundImage = "url('img/icons8-start.png')";
+    gI.field.stopLiving();
+    gI.activateButtons();
+    gI.docField.addEventListener('click', fieldClickEvent);
+}
+
+function fieldClickEvent(e) {
+    if (e.target.className == 'field-box') // мимо
+        return;
+    gI.field.cellArray[e.target.x + 1][e.target.y + 1].toggleState();
 }
 
 function playBtnClick() {
-    if (gameInstance.state == 'play') 
-        gameInstance.setStopState();
+    if (gI.state == 'play') 
+        gI.setStopState();
     else 
-        gameInstance.setStartState();
+        gI.setStartState();
 }
 
 function activateRandomBtn() {
-    gameInstance.field.randomState();
+    gI.field.randomState();
 }
 
 function activateKillingBtn() {
-    gameInstance.field.clean();
+    gI.field.clean();
 }
 
 function windowResizeEvent() {
-    gameInstance.field.cssResize();
+    gI.field.cssResize();
 }
 
 //
 window.onload = function() {
-    var docField = document.getElementById('field');
-    gameInstance.field = new Field (docField, 8, 8);
+    gI.docField = document.getElementById('field');
+    gI.field = new Field (gI.docField, 8, 8);
 
     window.addEventListener('resize', windowResizeEvent);
-    gameInstance.gameInit();
+    gI.gameInit();
 }
 

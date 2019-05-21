@@ -149,7 +149,7 @@ input[type="number"]::-webkit-outer-spin-button {
     font-weight: 500;
     font-size: 1.2em;
     padding: 2px 8px;
-    width: 3em;
+    width: 2em;
     text-align: center;
     border: 1px solid rgb(33, 150, 243);
     border-radius: 4px;
