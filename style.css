@@ -68,8 +68,16 @@ body {
     background-color: rgb(175, 223, 46);
 }
 
+.living-cell:hover {
+    background-color: rgb(158, 206, 26);
+}
+
 .dead-cell {
     background-color: rgb(86, 176, 250);
+}
+
+.dead-cell:hover {
+    background-color: rgb(56, 165, 253);
 }
 
 .field-settings {
