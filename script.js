@@ -3,11 +3,11 @@ var gI = {
     state: 'loading'
 }
 
-// хранит то, что касается правио игры 
+// хранит то, что касается правил игры 
 var gameMode = {
     minForLife: 2, // мин кол-во соседей для жизни
     maxForLife: 3, // макс кол-во соседей для жизни 
-    hoverTime: 2000, // время навеления на клетку для переключения ее состояния
+    hoverTime: 2000, // время наведения на клетку для переключения ее состояния
 
     neighborTraversal: null, // метод обхода соседей
     mouseoverEvent: null,
@@ -23,24 +23,24 @@ class Cell {
         this.next_st = false; // оживет ли клетка на следующей итерации
         this.box = document.createElement('div'); // ссылка на объект в документе
         this.box.className = 'cell dead-cell';
-        this.box.onmouseover = function(e) {gameMode.mouseoverEvent(e);}
-        this.box.onmouseout = function(e) {gameMode.mouseoutEvent(e);}
+        this.box.onmouseover = function (e) { gameMode.mouseoverEvent(e); }
+        this.box.onmouseout = function (e) { gameMode.mouseoutEvent(e); }
     }
 
-  	/**Оживить клетку на следующем этапе*/
+    /**Оживить клетку на следующем этапе*/
     reviveTheCell() {
         this.box.className = 'cell living-cell';
         this.next_st = true;
     }
-		/**Убить клетку на следующем этапе*/
+    /**Убить клетку на следующем этапе*/
     killTheCell() {
         this.box.className = 'cell dead-cell';
         this.next_st = false;
     }
 
-  	/**Установить состояние клетки на текущем этапе
+    /**Установить состояние клетки на текущем этапе
      * Вызывается при установке рандомного состояния*/
-    setState (newState) {
+    setState(newState) {
         if (newState) {
             this.box.className = 'cell living-cell';
             this.curr_st = true;
@@ -49,20 +49,20 @@ class Cell {
             this.curr_st = false;
         }
     }
-  
-  	/**Сменить текущее состояние клетки на противоположное
+
+    /**Сменить текущее состояние клетки на противоположное
      * Используется при клике*/
-  	toggleState() {
-     	if (this.curr_st) {
+    toggleState() {
+        if (this.curr_st) {
             this.box.className = 'cell dead-cell';
             this.curr_st = false;
         } else {
             this.box.className = 'cell living-cell';
             this.curr_st = true;
         }
-    } 
+    }
 
-  	/**Установить состояние клетки на следующем этапе
+    /**Установить состояние клетки на следующем этапе
      * Устанавливает согласно правилам из GameMode*/
     nextState() {
         /** Переход к следующему состоянию исходя из обстановки вокруг
@@ -70,22 +70,22 @@ class Cell {
          * Curr_st не меняется. Меняется лишь next_st
          */
         var aliveNeighbors = gameMode.neighborTraversal(this); // количество живых соседей
-				
-      	// живая клетка и [0;1] || [4;8] соседей => убить
+
+        // живая клетка и [0;1] || [4;8] соседей => убить
         if (this.curr_st && (aliveNeighbors < gameMode.minForLife || aliveNeighbors > gameMode.maxForLife)) {
             this.killTheCell();
             return;
         }
-      	// мертвая клетка и [2;3] соседей => оживить
+        // мертвая клетка и [2;3] соседей => оживить
         if (!this.curr_st && (aliveNeighbors == gameMode.maxForLife)) {
             this.reviveTheCell();
             return;
         }
-      	// состояние не изменилось
+        // состояние не изменилось
         this.next_st = this.curr_st;
     }
 
-  	/** Следующее состояние делает текущим
+    /** Следующее состояние делает текущим
      * Касается только внутреннего представления
      * css уже изменен */
     applyNewState() {
@@ -93,9 +93,9 @@ class Cell {
     }
 }
 
-/** ПОЛЕ*/ 
-class Field { 
-    constructor (obj, h, w) {
+/** ПОЛЕ*/
+class Field {
+    constructor(obj, h, w) {
         this.h = h; // высота поля (в клетках)
         this.w = w; // ширина поля
         this.cellArray = new Array(h); // массив клеток
@@ -108,12 +108,12 @@ class Field {
         this.cellStyleText = document.createTextNode('.cell {width: 50px; height: 50px;}');
 
         // Возвращает ссылку на массив клеток
-        Cell.prototype.getField = function() { // изменеие прототипа класса пока не создан ни один объект
+        Cell.prototype.getField = function () { // изменение прототипа класса пока не создан ни один объект
             return gI.field.cellArray;
         }
         this.cssResize();
 
-        // Создание бордюра из мертвых клеток, чтобы извавиться от проверок на границах поля
+        // Создание бордюра из мертвых клеток, чтобы избавиться от проверок на границах поля
         var lastIndexH = h + 1,
             lastIndexW = w + 1;
         // Слева и справа
@@ -137,12 +137,12 @@ class Field {
                 this.flexbox.appendChild(this.cellArray[i][j].box); // добавление в документ
             }
         }
-        
-        // Добавление в документ элемента <style> для изменеия параметров всего класса (.cell в частности)
-        var sheetArr = document.getElementsByTagName('style'); 
+
+        // Добавление в документ элемента <style> для изменения параметров всего класса (.cell в частности)
+        var sheetArr = document.getElementsByTagName('style');
         if (sheetArr.length == 0) { // ноадо убедиться, что элемента с таким тегом еще нет
             gI.sheet = document.createElement('style'); // создать и сохранить
-            (document.head || document.getElementsByTagName('head')[0]).appendChild (gI.sheet);
+            (document.head || document.getElementsByTagName('head')[0]).appendChild(gI.sheet);
         } else
             gI.sheet = sheetArr[0];
 
@@ -159,7 +159,7 @@ class Field {
     setIterTime(newIter) {
         this.iterTime = newIter;
     }
-  
+
     /**Отчистить все поле (умертвить все клетки) */
     clean() {
         for (let i = 1; i <= this.h; i++)
@@ -175,15 +175,15 @@ class Field {
             for (let j = 1; j <= fieldObj.w; j++)
                 fieldObj.cellArray[i][j].nextState();
     }
-    /**Сделать следующее состояние текущим */ 
+    /**Сделать следующее состояние текущим */
     applyCurrState(fieldObj) {
         for (let i = 1; i <= fieldObj.h; i++)
             for (let j = 1; j <= fieldObj.w; j++)
                 fieldObj.cellArray[i][j].applyNewState();
     }
 
-    /**УРндомно установить состояние клеток поля */
-    randomState(probability) { // probability - вероятность или потность. можно сделать опциональным
+    /**Рандомно установить состояние клеток поля */
+    randomState(probability) { // probability - вероятность или плотность. можно сделать опциональным
         if (probability == undefined) {
             probability = 0.5; // значение по-умолчанию
         }
@@ -191,12 +191,13 @@ class Field {
             for (let j = 1; j <= this.w; j++)
                 this.cellArray[i][j].setState(Math.random() <= probability);
     }
-  
+
     /** Начать игру (для поля)
-     * Вызывается при смене состояния игры после нажатия на кнопку play*/ 
+     * Вызывается при смене состояния игры после нажатия на кнопку play */
     startLiving() {
         this.timer = setTimeout(this.iteration, this.iterTime, this);
     }
+
     /**Перевод поля в следующее состояние
      * Запуск следующей итерации
      * Применение состояния
@@ -221,11 +222,13 @@ class Field {
             boxH = fieldParent.clientHeight - 30, // H - 2*padding
             docWH = boxW / boxH, // отношение ширины .flexbox к ее высоте в px
             cellSize;
-        if ( docWH >= (this.w / this.h)) { // поле должно растянуться в контейнере по-вертикали
+
+        if (docWH >= (this.w / this.h)) { // поле должно растянуться в контейнере по-вертикали
             cellSize = Math.round((boxH - 2 * this.cellMargin * this.h) / this.h * 100) / 100; // линейный размер клетки
             let newWidth = this.w * (cellSize + 2 * this.cellMargin); // ширина контейнера
             this.flexbox.style.width = newWidth + 'px';
-        } else {  // поле должно растянуться в контейнере по-горизонтали
+        } 
+        else {  // поле должно растянуться в контейнере по-горизонтали
             cellSize = Math.round((boxW - 2 * this.cellMargin * this.w) / this.w * 100) / 100;
             let newWidth = this.w * (cellSize + 2 * this.cellMargin);
             this.flexbox.style.width = newWidth + 'px';
@@ -240,50 +243,50 @@ class Field {
  * Возвращает кол-во живых соседей
  * Вынесен из класса, чтобы при смене настроек, метод мог меняться у всех клеток
  */
-gameMode.setTrav = function(infinity) { 
+gameMode.setTrav = function (infinity) {
     if (infinity) // Бесконечное поле
-        gameMode.neighborTraversal = function(cellObj) {
+        gameMode.neighborTraversal = function (cellObj) {
             var aliveNeighbors = 0; // количество живых соседей
 
-            var field = gI.field; 
+            var field = gI.field;
 
-            var stepForvard = function(x, maxX) {
+            var stepForvard = function (x, maxX) {
                 return (x + 1) % maxX;
             }
-            var stepBack = function(x, maxX) {
+            var stepBack = function (x, maxX) {
                 return (x - 1 + maxX) % maxX;
             }
             // Проверить, является клетка с координатами [x,y] живой
-            var checkNeighbor = function(x, y) {
+            var checkNeighbor = function (x, y) {
                 if (field.cellArray[x + 1][y + 1].curr_st)
                     aliveNeighbors++;
             }
 
-            var left   = stepBack(cellObj.box.y, field.w),    // номер столбца справа
-                right  = stepForvard(cellObj.box.y, field.w), // номер столбца слева
-                top    = stepBack(cellObj.box.x, field.h),    // номер строки сверху
+            var left = stepBack(cellObj.box.y, field.w),    // номер столбца справа
+                right = stepForvard(cellObj.box.y, field.w), // номер столбца слева
+                top = stepBack(cellObj.box.x, field.h),    // номер строки сверху
                 bottom = stepForvard(cellObj.box.x, field.h); // номер строки снизу
 
-            checkNeighbor(top, left);           // [0, 0]
-            checkNeighbor(top, cellObj.box.y);     // [0, 1]
-            checkNeighbor(top, right);          // [0, 2]
-            checkNeighbor(cellObj.box.x, left);    // [1, 0]
-            checkNeighbor(cellObj.box.x, right);   // [1, 2]
-            checkNeighbor(bottom, left);        // [2, 0]
-            checkNeighbor(bottom, cellObj.box.y);  // [2, 1]
-            checkNeighbor(bottom, right);       // [2, 2]
+            checkNeighbor(top, left);             // [0, 0]
+            checkNeighbor(top, cellObj.box.y);    // [0, 1]
+            checkNeighbor(top, right);            // [0, 2]
+            checkNeighbor(cellObj.box.x, left);   // [1, 0]
+            checkNeighbor(cellObj.box.x, right);  // [1, 2]
+            checkNeighbor(bottom, left);          // [2, 0]
+            checkNeighbor(bottom, cellObj.box.y); // [2, 1]
+            checkNeighbor(bottom, right);         // [2, 2]
 
             return aliveNeighbors;
         }
     else // Ограниченное поле
-        gameMode.neighborTraversal = function(cellObj) {
+        gameMode.neighborTraversal = function (cellObj) {
             var field = cellObj.getField(), // ссылка на поле
                 aliveNeighbors = 0; // количество живых соседей
 
             for (let i = -1; i <= 1; i++) {
                 for (let j = -1; j <= 1; j++) {
-                    if ((i || j) && field [cellObj.box.x + i + 1] [cellObj.box.y + j + 1].curr_st) // если это не сама клетка и эта клетка живая
-                        aliveNeighbors++; // увеличить счетчить живых соседей
+                    if ((i || j) && field[cellObj.box.x + i + 1][cellObj.box.y + j + 1].curr_st) // если это не сама клетка и эта клетка живая
+                        aliveNeighbors++; // увеличить счетчик живых соседей
                 }
             }
 
@@ -295,9 +298,9 @@ gameMode.setTrav = function(infinity) {
 /**Инициализация игры при первом запуске
  * Вызывается по событию window.onload
  */
-gI.gameInit = function() {
+gI.gameInit = function () {
     gameMode.setTrav(false);
-  
+
     gI.playButton    = document.getElementById('playButton');
     gI.randomButton  = document.getElementById('randomButton');
     gI.killingButton = document.getElementById('killingButton');
@@ -309,44 +312,45 @@ gI.gameInit = function() {
 
     gI.iterTime.innerHTML = gI.speedRange.value; // отображение значения с trackbar'а
     /** Изменение интервала между итерациями */
-    gI.speedRange.oninput = function() {
+    gI.speedRange.oninput = function () {
         gI.field.iterTime = this.value * 1000;
         gI.iterTime.innerHTML = this.value;
     }
 
     /**Настройка бесконечности поля*/
-    gI.checkbox.onchange = function() {
+    gI.checkbox.onchange = function () {
         gI.field.setInfinityOfField(gI.checkbox.checked);
     }
 
     /** Изменение количества клеток по высоте 
      * Ограничение: [2; 99]
     */
-    gI.heightInput.onchange = function() {
+    gI.heightInput.onchange = function () {
         var num = Math.trunc(gI.heightInput.value); // отбрасывание дробной части
         if (num < 2)
             num = 2;
         gI.heightInput.value = num;
+        
         var w = gI.field.w;
         gI.docField.innerHTML = ''; // удалить все клетки из документа
         gI.sheet.innerHTML = ''; // удалить стили клеток из документа
         gI.field = new Field(gI.docField, num, w); // создать поле нужного размера
-        gI.field.setIterTime (gI.speedRange.value * 1000); // обновить тймер и характ. поля в новом объекте
+        gI.field.setIterTime(gI.speedRange.value * 1000); // обновить тймер и характ. поля в новом объекте
         gI.field.setInfinityOfField(gI.checkbox.checked);
     }
 
     /**Не дает ввести дробное число */
     gI.heightInput.oninput = function () {
-        if (gI.heightInput.value.length > 2) 
+        if (gI.heightInput.value.length > 2)
             gI.heightInput.value = gI.heightInput.value.substr(0, 2);
     }
 
     /** Изменение количества клеток по ширине 
      * Ограничение: [2; 99]
     */
-    gI.widthInput.onchange = function() {
+    gI.widthInput.onchange = function () {
         var num = Math.trunc(gI.widthInput.value);
-        if (num < 2) 
+        if (num < 2)
             num = 2;
         gI.widthInput.value = num;
         var h = gI.field.h;
@@ -356,24 +360,24 @@ gI.gameInit = function() {
 
     /**Не дает ввести дробное число */
     gI.widthInput.oninput = function () {
-        if (gI.widthInput.value.length > 2) 
+        if (gI.widthInput.value.length > 2)
             gI.widthInput.value = gI.widthInput.value.substr(0, 2);
     }
 
     /**Событие, которое должно произойти при долгом наведении
      * Переключение состояния у клетки
      */
-    gameMode.hoverEvent = function(e) {
+    gameMode.hoverEvent = function (e) {
         if (e.target.hasAttribute('hoverEvent')) {
             gI.field.cellArray[e.target.x + 1][e.target.y + 1].toggleState();
             e.target.removeAttribute('hoverEvent');
-        }  
+        }
     }
 
     /**Событие при наведении на клетку
      * Отметить и запустить таймер
      */
-    gameMode.mouseoverEvent = function(e) {
+    gameMode.mouseoverEvent = function (e) {
         e.target.setAttribute('hoverEvent', '');
         gameMode.hoverTimer = setTimeout(gameMode.hoverEvent, gameMode.hoverTime, e);
     }
@@ -381,7 +385,7 @@ gI.gameInit = function() {
     /**Событие при отведении мыши с клетки
      * Удалить отметку и таймер
      */
-    gameMode.mouseoutEvent = function(e) {
+    gameMode.mouseoutEvent = function (e) {
         e.target.removeAttribute('hoverEvent', '');
         clearTimeout(gameMode.hoverTimer);
     }
@@ -395,13 +399,13 @@ gI.gameInit = function() {
 
 /**Сделать кнопки randomButton и killingButton активными
  */
-gI.activateButtons = function() {
+gI.activateButtons = function () {
     gI.randomButton.addEventListener('click', activateRandomBtn);
     gI.killingButton.addEventListener('click', activateKillingBtn);
 }
 
 /** Деактивировать кнопки randomButton и killingButton*/
-gI.deactivateButtons = function() {
+gI.deactivateButtons = function () {
     gI.randomButton.removeEventListener('click', activateRandomBtn);
     gI.killingButton.removeEventListener('click', activateKillingBtn);
 }
@@ -409,8 +413,8 @@ gI.deactivateButtons = function() {
 /**Установить состояние игры 'play'
  * Кликать по полю больше нельзя
 */
-gI.setStartState = function() {
-    if (gI.state == 'play') 
+gI.setStartState = function () {
+    if (gI.state == 'play')
         return;
     gI.state = 'play';
     gI.playButton.style.backgroundImage = "url('img/icons8-pause.png')"; // поменять картинку на кнопке
@@ -423,8 +427,8 @@ gI.setStartState = function() {
 }
 
 /**Установить сосотояние игры 'stop' */
-gI.setStopState = function() {
-    if (gI.state == 'stop') 
+gI.setStopState = function () {
+    if (gI.state == 'stop')
         return;
     gI.state = 'stop';
     gI.playButton.style.backgroundImage = "url('img/icons8-start.png')";
@@ -444,9 +448,9 @@ function fieldClickEvent(e) {
 }
 
 function playBtnClick() {
-    if (gI.state == 'play') 
+    if (gI.state == 'play')
         gI.setStopState();
-    else 
+    else
         gI.setStartState();
 }
 
@@ -463,9 +467,9 @@ function windowResizeEvent() {
 }
 
 //
-window.onload = function() {
+window.onload = function () {
     gI.docField = document.getElementById('field');
-    gI.field = new Field (gI.docField, 8, 8);
+    gI.field = new Field(gI.docField, 8, 8);
 
     window.addEventListener('resize', windowResizeEvent);
     gI.gameInit();

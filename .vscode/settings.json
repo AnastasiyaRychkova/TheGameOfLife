@@ -9,6 +9,7 @@
         "handlebars",
         "html",
         "jade",
+        "javascript",
         "javascriptreact",
         "json",
         "latex",
@@ -26,5 +27,4 @@
         "typescriptreact",
         "yml"
     ],
-    "cSpell.enabled": false
-}
+    "cSpell.enabled": true
